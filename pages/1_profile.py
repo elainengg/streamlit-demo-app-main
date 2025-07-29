@@ -57,8 +57,15 @@ with st.container(key="user-input-container"):
         chat_type = st.radio("", options=options, horizontal=True, label_visibility="collapsed")
 
         # User input
-        user_input = st.text_area(label="", height=100, label_visibility="collapsed")
-        submitted = st.form_submit_button("Send")
+        # user_input = st.text_area(label="", height=100, label_visibility="collapsed")
+        # submitted = st.form_submit_button("Send")
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            user_input = st.text_area(label="", height=100, label_visibility="collapsed")
+
+        with col2:
+            st.write("")  
+            submitted = st.form_submit_button("Send")
 
         MAX_CHARS = 15000
         char_count = len(user_input)
@@ -71,8 +78,9 @@ with st.container(key="user-input-container"):
             # Mock response  ( to later implement )
             st.session_state.messages.append({"role": "assistant", "content": "This is a sample response."})
             st.rerun() # Two avoid double tapping the send button 
-            # Disclaimer
+    
+    # Disclaimer
     st.write(
         "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
     )
-    
+
