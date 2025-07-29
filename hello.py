@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+with open("styles.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 # Center of the screen 
 with st.container(key="welcome-to-chatbot"):
     st.markdown(
@@ -19,13 +22,19 @@ with st.container(key="welcome-to-chatbot"):
     )
 
 # Unsure how to put chat up here
-st.write("### CHAT BOT HERE")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
+st.markdown("<div id='chat-scroll'>", unsafe_allow_html=True)
+for msg in st.session_state.messages:
+    role = msg["role"]
+    class_name = "user-bubble" if role == "user" else "assistant-bubble"
+    st.markdown(f"""
+    <div style='text-align: {"right" if role == "user" else "left"};'>
+        <div class='chat-bubble {class_name}'>
+            {msg["content"]}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
