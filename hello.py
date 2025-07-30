@@ -1,11 +1,10 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 
+# CSS Sheet
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Center of the screen 
+# Welcome block 
 with st.container(key="welcome-to-chatbot"):
     st.markdown(
         """
@@ -21,64 +20,45 @@ with st.container(key="welcome-to-chatbot"):
         unsafe_allow_html=True
     )
 
-# Unsure how to put chat up here
-st.markdown("<div id='chat-scroll'>", unsafe_allow_html=True)
-for msg in st.session_state.messages:
-    role = msg["role"]
-    class_name = "user-bubble" if role == "user" else "assistant-bubble"
-    st.markdown(f"""
-    <div style='text-align: {"right" if role == "user" else "left"};'>
-        <div class='chat-bubble {class_name}'>
-            {msg["content"]}
+# Check if has messages
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Messages 
+with st.container():
+    # Chatbox to scroll through
+    st.markdown('<div id="chat-scroll">', unsafe_allow_html=True)
+    # Going through session state array 
+    for msg in st.session_state.messages:
+
+        # Role assigning
+        role = msg["role"]
+        bubble_color = "#00742A" if role == "user" else "#3ca1ff"
+        if role == "user":
+            align = "right" 
+        else: 
+            align = "left"
+
+        st.markdown(f"""
+        <div class="chat-message" style='text-align: {align};'>
+            <div class="chat-bubble" style='background: {bubble_color};'>
+                {msg["content"]}
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-
-
-
-# User input fixed to bottom
-st.markdown(
-    """
-    <style>
-    /* Fix the user input container to the bottom */
-    div[data-testid="user-input-container"] {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-        padding: 1rem 2rem;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        z-index: 999;
-    }
-
-    /* Prevent content from hiding behind the input bar */
-    .main .block-container {
-        padding-bottom: 180px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
-# Remove border from form 
-st.markdown("""
-            <style>
-            div[data-testid="stForm"] {
-            border: none;
-            padding: 0;
-            box-shadow: none;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+# User input bar
 with st.container(key="user-input-container"):
-    with st.form("chat_form"):
+    with st.form("chat_form", clear_on_submit=True):
+
+        # Research Chat or Market Data radio 
         options = ["Research Chat", "Market Data"] 
         chat_type = st.radio("", options=options, horizontal=True, label_visibility="collapsed")
 
+        # User input
+        # user_input = st.text_area(label="", height=100, label_visibility="collapsed")
+        # submitted = st.form_submit_button("Send")
         col1, col2 = st.columns([3, 1])
         with col1:
             user_input = st.text_area(label="", height=100, label_visibility="collapsed")
@@ -87,20 +67,18 @@ with st.container(key="user-input-container"):
             st.write("")  
             submitted = st.form_submit_button("Send")
 
-        # Char count
-        MAX_CHARS = 15000 
+        MAX_CHARS = 15000
         char_count = len(user_input)
-        st.markdown(
-            f"<div style='text-align: left; color: gray;'>{char_count}/{MAX_CHARS}</div>", 
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<div class='char-count'>{char_count}/{MAX_CHARS}</div>", unsafe_allow_html=True)
         if char_count > MAX_CHARS:
             st.warning("Character limit exceeded!")
 
-    if submitted:
-        st.write("Button Clicked")
-
-        
+        if submitted and user_input.strip():
+            st.session_state.messages.append({"role": "user", "content": user_input.strip()})
+            # Mock response  ( to later implement )
+            st.session_state.messages.append({"role": "assistant", "content": "This is a sample response."})
+            st.rerun() # Two avoid double tapping the send button 
+    
     # Disclaimer
     st.write(
         "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
