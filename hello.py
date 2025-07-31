@@ -1,8 +1,12 @@
 import streamlit as st
+from sidebar import sidebar_chat_manager
 
 # CSS Sheet
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+sidebar_chat_manager()
 
 # Welcome block 
 with st.container(key="welcome-to-chatbot"):
@@ -83,4 +87,6 @@ with st.container(key="user-input-container"):
     st.write(
         "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
     )
+
+    
 
