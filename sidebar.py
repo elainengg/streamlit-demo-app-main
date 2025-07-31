@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def sidebar_chat_manager():
 
     with st.sidebar:
@@ -17,11 +18,13 @@ def sidebar_chat_manager():
             new_name = f"Chat {len(st.session_state.chats) + 1}"
             st.session_state.chats[new_name] = []
             st.session_state.current_chat = new_name
-        
+
         st.write("#### Older")
 
         chat_names = list(st.session_state.chats.keys())
-        selected_chat = st.radio("", chat_names, index=chat_names.index(st.session_state.current_chat))
+        selected_chat = st.radio(
+            "", chat_names, index=chat_names.index(st.session_state.current_chat)
+        )
 
         if selected_chat != st.session_state.current_chat:
             st.session_state.current_chat = selected_chat

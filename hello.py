@@ -4,15 +4,16 @@ from sidebar import sidebar_chat_manager
 # CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-# Custom CSS for wider text area
-st.markdown("""
-    <style>
-    .big-textbox textarea {
-        width: 100% !important;
-        min-width: 500px !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+
+# Hide the radio button circles
+hide_radio_style = """
+<style>
+div[role="radiogroup"] > label > div:first-child {
+    display: none !important;
+}
+</style>
+"""
+st.markdown(hide_radio_style, unsafe_allow_html=True)
 
 # Sidebar
 sidebar_chat_manager()
@@ -21,7 +22,7 @@ sidebar_chat_manager()
 if "chats" in st.session_state and "current_chat" in st.session_state:
     st.session_state.messages = st.session_state.chats[st.session_state.current_chat]
 
-# Welcome block 
+# Welcome block
 with st.container(key="welcome-to-chatbot"):
     st.markdown(
         """
@@ -34,7 +35,7 @@ with st.container(key="welcome-to-chatbot"):
             <br>For app related questions, please reach out to <b>tdsaimlhub@tdsecurities.com</b></p>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 # Messages container
@@ -45,17 +46,21 @@ with st.container():
         bubble_color = "#00742A" if role == "user" else "#3ca1ff"
         align = "right" if role == "user" else "left"
 
-        st.markdown(f"""
+        st.markdown(
+            f"""
         <div class="chat-message" style='text-align: {align};'>
             <div class="chat-bubble" style='background: {bubble_color};'>
                 {msg["content"]}
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Input form
-st.markdown("""
+st.markdown(
+    """
     <style>
     /* Remove border/shadow/padding around the form container */
     div[data-testid="stForm"] {
@@ -66,21 +71,28 @@ st.markdown("""
         margin: 0 !important;
     }
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 with st.container(key="user-input-container"):
     with st.form("chat_form", clear_on_submit=True):
 
         col1, col2 = st.columns([10, 1])
-        
+
         with col1:
-            user_input = st.text_area(label="", height=100, label_visibility="collapsed")
+            user_input = st.text_area(
+                label="", height=100, label_visibility="collapsed"
+            )
 
         with col2:
             submitted = st.form_submit_button("📤")
 
         MAX_CHARS = 15000
         char_count = len(user_input)
-        st.markdown(f"<div class='char-count'>{char_count}/{MAX_CHARS}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='char-count'>{char_count}/{MAX_CHARS}</div>",
+            unsafe_allow_html=True,
+        )
         if char_count > MAX_CHARS:
             st.warning("Character limit exceeded!")
 
@@ -92,9 +104,12 @@ with st.container(key="user-input-container"):
                 {"role": "assistant", "content": "This is a sample response."}
             )
 
-        # Rename chat to first prompt if there is the first message 
-            if current_chat.startswith("Chat") and len(st.session_state.chats[current_chat]) == 2:
-                # Trim the prompt to the first 40 letters 
+            # Rename chat to first prompt if there is the first message
+            if (
+                current_chat.startswith("Chat")
+                and len(st.session_state.chats[current_chat]) == 2
+            ):
+                # Trim the prompt to the first 40 letters
                 prompt_snippet = user_input.strip().split("\n")[0][:40]
                 prompt_snippet = prompt_snippet if prompt_snippet else "Untitled"
                 new_chat_name = prompt_snippet.strip()
@@ -106,9 +121,12 @@ with st.container(key="user-input-container"):
                     count += 1
 
                 # Rename the chat
-                st.session_state.chats[new_chat_name] = st.session_state.chats.pop(current_chat)
+                st.session_state.chats[new_chat_name] = st.session_state.chats.pop(
+                    current_chat
+                )
                 st.session_state.current_chat = new_chat_name
             st.rerun()
 
-
-    st.write("Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here.")
+    st.write(
+        "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
+    )
