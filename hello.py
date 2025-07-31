@@ -4,6 +4,15 @@ from sidebar import sidebar_chat_manager
 # CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# Custom CSS for wider text area
+st.markdown("""
+    <style>
+    .big-textbox textarea {
+        width: 100% !important;
+        min-width: 500px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Sidebar
 sidebar_chat_manager()
@@ -46,16 +55,28 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Input form
+st.markdown("""
+    <style>
+    /* Remove border/shadow/padding around the form container */
+    div[data-testid="stForm"] {
+        border: none !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 with st.container(key="user-input-container"):
     with st.form("chat_form", clear_on_submit=True):
 
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([10, 1])
+        
         with col1:
             user_input = st.text_area(label="", height=100, label_visibility="collapsed")
 
         with col2:
-            st.write("")  
-            submitted = st.form_submit_button("Send")
+            submitted = st.form_submit_button("📤")
 
         MAX_CHARS = 15000
         char_count = len(user_input)
