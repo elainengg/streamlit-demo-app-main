@@ -1,12 +1,16 @@
 import streamlit as st
 from sidebar import sidebar_chat_manager
 
-# CSS Sheet
+# CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-
+# Sidebar
 sidebar_chat_manager()
+
+# Sync messages with current chat
+if "chats" in st.session_state and "current_chat" in st.session_state:
+    st.session_state.messages = st.session_state.chats[st.session_state.current_chat]
 
 # Welcome block 
 with st.container(key="welcome-to-chatbot"):
@@ -24,24 +28,13 @@ with st.container(key="welcome-to-chatbot"):
         unsafe_allow_html=True
     )
 
-# Check if has messages
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Messages 
+# Messages container
 with st.container():
-    # Chatbox to scroll through
     st.markdown('<div id="chat-scroll">', unsafe_allow_html=True)
-    # Going through session state array 
     for msg in st.session_state.messages:
-
-        # Role assigning
         role = msg["role"]
         bubble_color = "#00742A" if role == "user" else "#3ca1ff"
-        if role == "user":
-            align = "right" 
-        else: 
-            align = "left"
+        align = "right" if role == "user" else "left"
 
         st.markdown(f"""
         <div class="chat-message" style='text-align: {align};'>
@@ -52,17 +45,12 @@ with st.container():
         """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# User input bar
+# Input form
 with st.container(key="user-input-container"):
     with st.form("chat_form", clear_on_submit=True):
-
-        # Research Chat or Market Data radio 
         options = ["Research Chat", "Market Data"] 
         chat_type = st.radio("", options=options, horizontal=True, label_visibility="collapsed")
 
-        # User input
-        # user_input = st.text_area(label="", height=100, label_visibility="collapsed")
-        # submitted = st.form_submit_button("Send")
         col1, col2 = st.columns([3, 1])
         with col1:
             user_input = st.text_area(label="", height=100, label_visibility="collapsed")
@@ -78,15 +66,30 @@ with st.container(key="user-input-container"):
             st.warning("Character limit exceeded!")
 
         if submitted and user_input.strip():
-            st.session_state.messages.append({"role": "user", "content": user_input.strip()})
-            # Mock response  ( to later implement )
-            st.session_state.messages.append({"role": "assistant", "content": "This is a sample response."})
-            st.rerun() # Two avoid double tapping the send button 
-    
-    # Disclaimer
-    st.write(
-        "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
-    )
+            msg = {"role": "user", "content": user_input.strip()}
+            current_chat = st.session_state.current_chat
+            st.session_state.chats[current_chat].append(msg)
+            st.session_state.chats[current_chat].append(
+                {"role": "assistant", "content": "This is a sample response."}
+            )
 
-    
+        # Rename chat to first prompt if there is the first message 
+            if current_chat.startswith("Chat") and len(st.session_state.chats[current_chat]) == 2:
+                # Trim the prompt to the first 40 letters 
+                prompt_snippet = user_input.strip().split("\n")[0][:40]
+                prompt_snippet = prompt_snippet if prompt_snippet else "Untitled"
+                new_chat_name = prompt_snippet.strip()
 
+                # For the new chats we make
+                count = 1
+                while new_chat_name in st.session_state.chats:
+                    new_chat_name = f"{prompt_snippet.strip()} ({count})"
+                    count += 1
+
+                # Rename the chat
+                st.session_state.chats[new_chat_name] = st.session_state.chats.pop(current_chat)
+                st.session_state.current_chat = new_chat_name
+            st.rerun()
+
+
+    st.write("Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here.")
