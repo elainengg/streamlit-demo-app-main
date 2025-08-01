@@ -1,5 +1,4 @@
 import streamlit as st
-from sidebar import sidebar_chat_manager
 
 # CSS
 with open("styles.css") as f:
