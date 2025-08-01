@@ -102,6 +102,6 @@ with st.container(key="user-input-container"):
             st.rerun()  # Two avoid double tapping the send button
 
     # Disclaimer
+    disclaimer_url = "https://github.com/elainengg/streamlit-demo-app-main"
     st.write(
-        "Artificial intelligence can make mistakes. Fact-check important information before using. Read our disclaimer here."
-    )
+        "Artificial intelligence can make mistakes. Fact-check important information before using. Read our " + "[disclaimer here](%s)" % disclaimer_url)
