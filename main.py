@@ -4,6 +4,8 @@ import streamlit as st
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+st.set_page_config(layout="wide", 
+                   page_title="DCM AI Chatbot")
 
 # Welcome block
 with st.container(key="welcome-to-chatbot"):
@@ -67,7 +69,6 @@ div[data-testid="stForm"] {
 # User input bar
 
 with st.container(key="user-input-container"):
-    st.set_page_config(layout="wide")
 
     with st.form("chat_form", clear_on_submit=True):
 
